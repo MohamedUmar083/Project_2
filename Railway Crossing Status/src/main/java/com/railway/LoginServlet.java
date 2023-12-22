@@ -15,11 +15,11 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
     static {
-        // Load the JDBC driver during class initialization
+      
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace(); // Handle the exception appropriately in your application
+            e.printStackTrace(); 
         }
     }
 
@@ -39,12 +39,12 @@ public class LoginServlet extends HttpServlet {
     }
 
     private boolean checkAdminCredentials(String username, String password) {
-        // Provide your actual database connection details
+        
         String jdbcUrl = "jdbc:mysql://localhost:3306/railwayproject";
         String dbUsername = "root";
-        String dbPassword = "Mohdumar@1011302";
+        String dbPassword = "password";
 
-        // SQL query to check admin credentials
+        
         String query = "SELECT * FROM admin WHERE username = ? AND password = ?";
 
         try (Connection connection = DriverManager.getConnection(jdbcUrl, dbUsername, dbPassword);
@@ -53,10 +53,10 @@ public class LoginServlet extends HttpServlet {
             statement.setString(2, password);
 
             try (ResultSet resultSet = statement.executeQuery()) {
-                return resultSet.next(); // Returns true if a matching admin is found
+                return resultSet.next(); 
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle the exception appropriately in your application
+            e.printStackTrace();
             return false;
         }
     }

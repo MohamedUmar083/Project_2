@@ -46,7 +46,7 @@
            // Provide your actual database connection details
           String jdbcUrl = "jdbc:mysql://localhost:3306/railwayproject";
         String dbUsername = "root";
-        String dbPassword = "Mohdumar@1011302";
+        String dbPassword = "password";
 
            // SQL query to insert user details
         String insertQuery = "INSERT INTO user (username, password) VALUES (?, ?)";

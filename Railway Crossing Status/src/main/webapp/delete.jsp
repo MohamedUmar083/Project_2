@@ -5,7 +5,7 @@ String id=request.getParameter("id");
 try
 {
 Class.forName("com.mysql.jdbc.Driver");
-Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/railwayproject", "root", "Mohdumar@1011302");
+Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/railwayproject", "root", "password");
 Statement st=conn.createStatement();
 int i=st.executeUpdate("DELETE FROM trains WHERE id="+id);
 out.println("Data Deleted Successfully!");

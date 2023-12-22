@@ -8,7 +8,7 @@ public class Train {
     private String landmark;
     private String address;
 
-    // Constructors, getters, and setters
+   
 
     public Train(String trainName, String crossingStatus, String personInCharge, String trainSchedule, String landmark, String address) {
         this.trainName = trainName;

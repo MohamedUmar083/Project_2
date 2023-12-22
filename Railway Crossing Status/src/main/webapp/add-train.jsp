@@ -13,10 +13,10 @@
 </head>
 <body>
 
-    <!-- Header -->
+    
     <h1>Add New Train</h1>
 
-    <!-- Form to add a new train -->
+    
     <form action="add-train-handler.jsp" method="post">
         <label for="trainName">Train Name:</label>
         <input type="text" id="trainName" name="trainName" required><br>
@@ -43,7 +43,7 @@
         <input type="submit" value="Add Train">
     </form>
 
-    <!-- Rest of your code... -->
+   
 
 </body>
 </html>

@@ -4,7 +4,7 @@ pageEncoding="ISO-8859-1"%>
 <%! String driverName = "com.mysql.jdbc.Driver";%>
 <%!String url = "jdbc:mysql://localhost:3306/railwayproject";%>
 <%!String user = "root";%>
-<%!String psw = "Mohdumar@1011302";%>
+<%!String psw = "password";%>
 <%
 String id = request.getParameter("id");
 String trainName = request.getParameter("trainName");

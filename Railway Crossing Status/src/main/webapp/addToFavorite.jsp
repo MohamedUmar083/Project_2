@@ -21,7 +21,7 @@
             // Database connection details
             String jdbcUrl = "jdbc:mysql://localhost:3306/railwayproject";
             String dbUsername = "root";
-            String dbPassword = "Mohdumar@1011302";
+            String dbPassword = "password";
 
             // Establish the database connection
             Class.forName("com.mysql.cj.jdbc.Driver");
