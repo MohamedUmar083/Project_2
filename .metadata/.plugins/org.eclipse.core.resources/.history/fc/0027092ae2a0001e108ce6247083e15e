@@ -1,0 +1,106 @@
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.DriverManager" %>
+<%@ page import="java.sql.PreparedStatement" %>
+<%@ page import="java.sql.ResultSet" %>
+<%@ page import="java.sql.SQLException" %>
+<%@ page import="com.railway.Train" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<%
+// Database connection details
+String jdbcUrl = "jdbc:mysql://localhost:3306/railwayproject";
+String dbUsername = "root";
+String dbPassword = "Mohdumar@1011302";
+
+// Function to get the list of trains from the database
+List<Train> getTrainsFromDatabase() {
+    List<Train> trainList = new ArrayList<>();
+
+    try {
+        // Establish the database connection
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection connection = DriverManager.getConnection(jdbcUrl, dbUsername, dbPassword);
+
+        // Retrieve data from the database
+        String selectQuery = "SELECT * FROM trains";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(selectQuery)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            // Process the result set and populate the trainList
+            while (resultSet.next()) {
+                Train train = new Train();
+                train.setId(resultSet.getInt("id"));
+                train.setTrainName(resultSet.getString("train_name"));
+                train.setCrossingStatus(resultSet.getString("crossing_status"));
+                train.setPersonInCharge(resultSet.getString("person_in_charge"));
+                train.setTrainSchedule(resultSet.getString("train_schedule"));
+                train.setLandmark(resultSet.getString("landmark"));
+                train.setAddress(resultSet.getString("address"));
+
+                trainList.add(train);
+            }
+        }
+
+        // Close the connection
+        connection.close();
+    } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+    }
+
+    return trainList;
+}
+
+// Get the list of trains from the database
+List<Train> trainList = getTrainsFromDatabase();
+%>
+
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <!-- Add Train button -->
+    <h1>Welcome to the Admin Dashboard</h1>
+    <form action="add-train.jsp" method="get" style="position: absolute; top: 10px; right: 150px;">
+        <input type="submit" value="Add Train">
+    </form>
+
+    <h2>Train Details</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Train Name</th>
+                <th>Status</th>
+                <th>Person in Charge</th>
+                <th>Schedule</th>
+                <th>Landmark</th>
+                <th>Address</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% for (Train train : trainList) { %>
+                <tr>
+                    <td><%= train.getTrainName() %></td>
+                    <td><%= train.getCrossingStatus() %></td>
+                    <td><%= train.getPersonInCharge() %></td>
+                    <td><%= train.getTrainSchedule() %></td>
+                    <td><%= train.getLandmark() %></td>
+                    <td><%= train.getAddress() %></td>
+                    <td>
+                        <form action="update-train.jsp" method="post">
+                            <input type="hidden" name="id" value="<%= train.getId() %>">
+                            <input type="submit" value="Update">
+                        </form>
+                    </td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+
+    <!-- Add any other admin-specific content here -->
+
+</body>
+</html>

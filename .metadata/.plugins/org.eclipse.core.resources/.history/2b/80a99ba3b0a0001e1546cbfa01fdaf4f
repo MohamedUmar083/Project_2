@@ -1,0 +1,19 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Dashboard</title>
+</head>
+<body>
+    <h1>Welcome to the User Dashboard</h1>
+
+    <h2>Available Trains</h2>
+    <ul>
+        <% List<Train> availableTrains = (List<Train>)request.getAttribute("availableTrains");
+           for (Train train : availableTrains) { %>
+            <li><%= train.getTrainName() %> - <%= train.getLandmark() %></li>
+        <% } %>
+    </ul>
+</body>
+</html>

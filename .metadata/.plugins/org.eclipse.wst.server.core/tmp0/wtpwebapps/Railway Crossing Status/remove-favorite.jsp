@@ -1,0 +1,48 @@
+<%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.DriverManager" %>
+<%@ page import="java.sql.PreparedStatement" %>
+<%@ page import="java.sql.SQLException" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<%
+    // Retrieve the user ID from the session
+    String userId = (String) session.getAttribute("userId");
+
+    // Check if the user is logged in
+    if (userId != null && !userId.isEmpty()) {
+        try {
+            // Database connection details
+             String jdbcUrl = "jdbc:mysql://localhost:3306/railwayproject";
+                String dbUsername = "root";
+                String dbPassword = "Mohdumar@1011302";
+
+
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(jdbcUrl, dbUsername, dbPassword);
+
+            // Retrieve the train ID from the request parameter
+            String trainId = request.getParameter("trainId");
+
+            // Check if the train ID is not null or empty
+            if (trainId != null && !trainId.isEmpty()) {
+                // Remove the train from the user_favorite table
+                String removeSql = "DELETE FROM user_favorite WHERE user_id = ? AND train_id = ?";
+                try (PreparedStatement removeStatement = connection.prepareStatement(removeSql)) {
+                    removeStatement.setString(1, userId);
+                    removeStatement.setString(2, trainId);
+                    removeStatement.executeUpdate();
+                }
+
+                // Redirect back to favorite.jsp
+                response.sendRedirect("favorite.jsp");
+            } else {
+                out.println("Train ID is missing or invalid.");
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace(); // Handle the exception appropriately in your application
+        }
+    } else {
+        // Handle the case where the user is not logged in
+        response.sendRedirect("user-login.jsp");
+    }
+%>

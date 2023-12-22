@@ -1,0 +1,97 @@
+<%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.DriverManager" %>
+<%@ page import="java.sql.PreparedStatement" %>
+<%@ page import="java.sql.ResultSet" %>
+<%@ page import="java.sql.SQLException" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+   <%
+    // Check if the user is logged in
+    HttpSession userSession = request.getSession(false);
+    if (userSession == null || userSession.getAttribute("userId") == null) {
+        // Redirect to the login page if not logged in
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    // Continue rendering the page for a logged-in user
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Dashboard</title>
+</head>
+<body>
+    <h1>Welcome to the User Dashboard</h1>
+    <form action="favorite.jsp" method="get" style="position: absolute; top: 10px; right: 190px;">
+        <input type="submit" value="My Favorite">
+    </form>
+    <form action="userlogout.jsp" method="get" style="position: absolute; top: 10px; right: 100px;">
+        <input type="submit" value="Log Out">
+    </form>
+    
+
+      <h2>Train Details</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Train Name</th>
+                <th>Status</th>
+                <th>Person in Charge</th>
+                <th>Schedule</th>
+                <th>Landmark</th>
+                <th>Address</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <%
+            try {
+                // Database connection details
+                String jdbcUrl = "jdbc:mysql://localhost:3306/railwayproject";
+                String dbUsername = "root";
+                String dbPassword = "Mohdumar@1011302";
+
+                // Establish the database connection
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                Connection connection = DriverManager.getConnection(jdbcUrl, dbUsername, dbPassword);
+
+                // Query to retrieve available trains
+                String sql = "SELECT * FROM trains";
+                try (PreparedStatement statement = connection.prepareStatement(sql);
+                     ResultSet resultSet = statement.executeQuery()) {
+
+                	while (resultSet.next()) {
+                        String trainName = resultSet.getString("train_name");
+                        String status = resultSet.getString("crossing_status");
+                        String personInCharge = resultSet.getString("person_in_charge");
+                        String schedule = resultSet.getString("train_schedule");
+                        String landmark = resultSet.getString("landmark");
+                        String address = resultSet.getString("address");
+
+                        // Display train details in the table
+            %>
+                        <tr>
+                             <td><%= trainName %></td>
+            <td><%= status %></td>
+            <td><%= personInCharge %></td>
+            <td><%= schedule %></td>
+            <td><%= landmark %></td>
+            <td><%= address %></td>
+            <td>
+            
+            <a href="addToFavorite.jsp?trainId=<%=resultSet.getString("id")%>">
+    <button type="button" class="favorite">Add to Favorite</button>
+</a>
+            </td>
+                        </tr>
+            <%
+                    }
+                }
+            } catch (ClassNotFoundException | SQLException e) {
+                e.printStackTrace(); // Handle the exception appropriately in your application
+            }
+            %>
+        </tbody>
+    </table>
+</body>
+</html>

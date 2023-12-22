@@ -1,0 +1,80 @@
+package com.railway;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/dashboard")
+public class DashboardServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        List<Train> availableTrains = getAvailableTrainsFromDatabase();
+
+        // Ensure availableTrains is not null
+        if (availableTrains == null) {
+            availableTrains = new ArrayList<>();
+        }
+
+        request.setAttribute("availableTrains", availableTrains);
+
+        // Check if the user is an admin or a normal user
+        boolean isAdmin = "admin".equals(request.getSession().getAttribute("userType"));
+        if (isAdmin) {
+            request.getRequestDispatcher("admin-dashboard.jsp").forward(request, response);
+        } else {
+            request.getRequestDispatcher("user-dashboard.jsp").forward(request, response);
+        }
+    }
+
+    private List<Train> getAvailableTrainsFromDatabase() {
+        List<Train> trains = new ArrayList<>();
+
+        try {
+            // Replace with your database credentials
+            String jdbcUrl = "jdbc:mysql://localhost:3306/your_database";
+            String dbUsername = "root";
+            String dbPassword = "Mohdumar@1011302";
+
+            // Load the JDBC driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Establish a connection
+            try (Connection connection = DriverManager.getConnection(jdbcUrl, dbUsername, dbPassword)) {
+                // SQL query to retrieve all trains
+                String sql = "SELECT * FROM trains";
+                try (PreparedStatement statement = connection.prepareStatement(sql);
+                     ResultSet resultSet = statement.executeQuery()) {
+
+                    while (resultSet.next()) {
+                        String trainName = resultSet.getString("train_name");
+                        String crossingStatus = resultSet.getString("crossing_status");
+                        String personInCharge = resultSet.getString("person_in_charge");
+                        String trainSchedule = resultSet.getString("train_schedule");
+                        String landmark = resultSet.getString("landmark");
+                        String address = resultSet.getString("address");
+
+                        Train train = new Train(trainName, crossingStatus, personInCharge, trainSchedule, landmark, address);
+                        trains.add(train);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return trains;
+    }
+
+}

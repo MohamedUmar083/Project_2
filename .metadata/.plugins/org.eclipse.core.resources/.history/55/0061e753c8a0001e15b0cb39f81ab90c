@@ -1,0 +1,58 @@
+<%@ page import="java.io.IOException" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.DriverManager" %>
+<%@ page import="java.sql.PreparedStatement" %>
+<%@ page import="java.sql.SQLException" %>
+<%@ page import="java.io.PrintWriter" %>
+
+
+
+<%
+// Retrieve form parameters
+String trainName = request.getParameter("trainName");
+String crossingStatus = request.getParameter("crossingStatus");
+String personInCharge = request.getParameter("personInCharge");
+String trainSchedule = request.getParameter("trainSchedule");
+String landmark = request.getParameter("landmark");
+String address = request.getParameter("address");
+
+// Database connection details (update with your actual values)
+String url = "jdbc:mysql://your-database-host:your-database-port/your-database-name";
+String user = "your-database-username";
+String password = "your-database-password";
+
+try {
+    // Load the JDBC driver
+    Class.forName("com.mysql.cj.jdbc.Driver");
+
+    // Establish a connection
+    Connection connection = DriverManager.getConnection(url, user, password);
+
+    // Insert data into the database
+    String insertQuery = "INSERT INTO trains (train_name, crossing_status, person_in_charge, train_schedule, landmark, address) VALUES (?, ?, ?, ?, ?, ?)";
+    try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+        preparedStatement.setString(1, trainName);
+        preparedStatement.setString(2, crossingStatus);
+        preparedStatement.setString(3, personInCharge);
+        preparedStatement.setString(4, trainSchedule);
+        preparedStatement.setString(5, landmark);
+        preparedStatement.setString(6, address);
+
+        // Execute the query
+        preparedStatement.executeUpdate();
+    }
+
+    // Close the connection
+    connection.close();
+
+    // Redirect back to admin-dashboard.jsp after successful insertion
+    response.sendRedirect("admin-dashboard.jsp");
+
+} catch (ClassNotFoundException | SQLException | IOException e) {
+    // Handle exceptions
+    e.printStackTrace();
+    // You may want to handle errors appropriately (e.g., show an error message)
+    response.sendRedirect("admin-dashboard.jsp");
+}
+%>

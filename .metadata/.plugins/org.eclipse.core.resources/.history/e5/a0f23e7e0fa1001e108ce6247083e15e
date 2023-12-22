@@ -1,0 +1,46 @@
+package com.railway;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+
+
+@WebServlet("/dashboard")
+public class DashboardServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Check if the user is logged in
+        String username = (String) request.getSession().getAttribute("username");
+        if (username == null) {
+            // Redirect to the login page if the user is not logged in
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
+        // Fetch available trains from the database
+        List<Train> availableTrains = DatabaseHandler.getAvailableTrains();
+
+        // Set the available trains in the request attribute
+        request.setAttribute("availableTrains", availableTrains);
+
+        // Forward the request to the appropriate dashboard based on user type
+        boolean isAdmin = "admin".equals(request.getSession().getAttribute("userType"));
+        if (isAdmin) {
+            request.getRequestDispatcher("admin-dashboard.jsp").forward(request, response);
+        } else {
+            request.getRequestDispatcher("user-dashboard.jsp").forward(request, response);
+        }
+    }
+}

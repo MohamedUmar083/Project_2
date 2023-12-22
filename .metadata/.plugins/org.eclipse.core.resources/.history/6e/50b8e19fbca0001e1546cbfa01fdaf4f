@@ -1,0 +1,27 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+    <%@ page import="java.util.List" %>
+<%@ page import="com.railway.Train" %>
+    
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Dashboard</title>
+</head>
+<body>
+    <h1>Welcome to the User Dashboard</h1>
+
+    <h2>Available Trains</h2>
+    <ul>
+        <% 
+        List<Train> availableTrains = (List<Train>)request.getAttribute("availableTrains");
+        if (availableTrains != null && !availableTrains.isEmpty()) {
+            for (Train train : availableTrains) { %>
+                <li><%= train.getTrainName() %> - <%= train.getLandmark() %></li>
+        <% } 
+        } else { %>
+            <li>No available trains</li>
+        <% } %>
+    </ul>
+</body>
+</html>

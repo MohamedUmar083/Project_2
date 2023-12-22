@@ -1,0 +1,53 @@
+package com.railway;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+@WebServlet("/register")
+public class RegisterServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+
+        // Validate username and password (you may add more validation)
+
+        // Insert new user into the "user" table
+        if (insertUser(username, password)) {
+            response.sendRedirect("login.jsp"); // Redirect to login page after successful registration
+        } else {
+            request.setAttribute("errorMessage", "Registration failed. Please try again.");
+            request.getRequestDispatcher("register.jsp").forward(request, response);
+        }
+    }
+
+    private boolean insertUser(String username, String password) {
+        // You need to implement database interaction to insert a new user
+        // Use JDBC or your preferred database access method
+
+        // Example (replace with actual database interaction):
+        String query = "INSERT INTO user (username, password) VALUES (?, ?)";
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/railwayproject", "root", "Mohdmar@1011302");
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, username);
+            statement.setString(2, password);
+
+            int rowsAffected = statement.executeUpdate();
+            return rowsAffected > 0; // Returns true if the user is successfully inserted
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception appropriately in your application
+            return false;
+        }
+    }
+}
+

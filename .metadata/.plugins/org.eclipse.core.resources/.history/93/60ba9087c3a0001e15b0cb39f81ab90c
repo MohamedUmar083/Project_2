@@ -1,0 +1,5 @@
+package com.rcs.dao;
+
+public class RegisterDao {
+
+}

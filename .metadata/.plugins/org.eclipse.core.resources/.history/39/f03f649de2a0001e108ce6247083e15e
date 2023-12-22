@@ -1,0 +1,70 @@
+<%@page import="java.sql.DriverManager"%>
+<%@page import="java.sql.ResultSet"%>
+<%@page import="java.sql.Statement"%>
+<%@page import="java.sql.Connection"%>
+<%
+String driver = "com.mysql.jdbc.Driver";
+String connectionUrl = "jdbc:mysql://localhost:3306/railwayproject";
+String database = "railwayproject";
+String userid = "root";
+String password = "Mohdumar@1011302";
+try {
+Class.forName(driver);
+} catch (ClassNotFoundException e) {
+e.printStackTrace();
+}
+Connection connection = null;
+Statement statement = null;
+ResultSet resultSet = null;
+%>
+
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <!-- Add Train button -->
+    <h1>Welcome to the Admin Dashboard</h1>
+    <form action="add-train.jsp" method="get" style="position: absolute; top: 10px; right: 150px;">
+        <input type="submit" value="Add Train">
+    </form>
+
+    <h2>Train Details</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Train Name</th>
+                <th>Status</th>
+                <th>Person in Charge</th>
+                <th>Schedule</th>
+                <th>Landmark</th>
+                <th>Address</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        <%
+try{
+connection = DriverManager.getConnection(connectionUrl+database, userid, password);
+statement=connection.createStatement();
+String sql ="select * from trains";
+resultSet = statement.executeQuery(sql);
+int i=0;
+while(resultSet.next()){
+%>
+          
+                <tr>
+<td><%=resultSet.getString("fname") %></td>
+<td><%=resultSet.getString("lname") %></td>
+<td><%=resultSet.getString("city_name") %></td>
+<td><%=resultSet.getString("email") %></td>
+<td><a href="delete.jsp?id=<%=resultSet.getString("id") %>"><button type="button"  class="delete">Delete</button></a></td>
+</tr>
+           
+        </tbody>
+    </table>
+
+    <!-- Add any other admin-specific content here -->
+
+</body>
+</html>

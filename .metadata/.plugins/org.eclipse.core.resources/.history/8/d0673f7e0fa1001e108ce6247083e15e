@@ -1,0 +1,43 @@
+package com.railway;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class DatabaseHandler {
+
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/railwayproject";
+    private static final String DB_USERNAME = "root";
+    private static final String DB_PASSWORD = "Mohdumar@1011302";
+
+    public static List<Train> getAvailableTrains() {
+        List<Train> availableTrains = new ArrayList<>();
+
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, DB_USERNAME, DB_PASSWORD)) {
+        	System.out.println("Connected to the database");
+            String sql = "SELECT * FROM trains";
+            try (PreparedStatement statement = connection.prepareStatement(sql);
+                 ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    String trainName = resultSet.getString("train_name");
+                    String status = resultSet.getString("status");
+                    String personInCharge = resultSet.getString("person_in_charge");
+                    String schedule = resultSet.getString("schedule");
+                    String landmark = resultSet.getString("landmark");
+                    String address = resultSet.getString("address");
+
+                    Train train = new Train(trainName, status, personInCharge, schedule, landmark, address);
+                    availableTrains.add(train);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception appropriately in your application
+        }
+
+        return availableTrains;
+    }
+}

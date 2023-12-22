@@ -1,0 +1,88 @@
+package com.railway;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+@WebServlet("/login")
+public class LoginServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+
+        if ("admin".equals(username)) {
+            // Check the admin password from the database
+            if (checkAdminPassword(password)) {
+                response.sendRedirect("admin-dashboard.jsp");
+            } else {
+                // Incorrect admin password
+                handleInvalidCredentials(request, response);
+            }
+        } else {
+            // Check normal user credentials against the user table
+            if (checkUserCredentials(username, password)) {
+                response.sendRedirect("user-dashboard.jsp");
+            } else {
+                // Incorrect credentials
+                handleInvalidCredentials(request, response);
+            }
+        }
+    }
+    private boolean checkAdminPassword(String password) {
+        // Provide your actual database connection details
+        String jdbcUrl = "jdbc:mysql://localhost:3306/your_database";
+        String dbUsername = "your_db_username";
+        String dbPassword = "your_db_password";
+
+        // SQL query to check admin password
+        String query = "SELECT * FROM admin WHERE username = 'admin' AND password = ?";
+
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, dbUsername, dbPassword);
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, password);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next(); // Returns true if a matching admin is found
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception appropriately in your application
+            return false;
+        }
+    }
+    private boolean checkUserCredentials(String username, String password) {
+        // You need to implement database interaction to check normal user credentials
+        // Use JDBC or your preferred database access method
+
+        // Example (replace with actual database interaction):
+        // Assume "users" table with columns "username" and "password"
+        String query = "SELECT * FROM user WHERE username = ? AND password = ?";
+        try (Connection connection = DriverManager.getConnection("your_db_url", "your_db_username", "your_db_password");
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, username);
+            statement.setString(2, password);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next(); // Returns true if a matching user is found
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception appropriately in your application
+            return false;
+        }
+    }
+
+    private void handleInvalidCredentials(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setAttribute("errorMessage", "Invalid credentials. Please try again.");
+        request.getRequestDispatcher("login.jsp").forward(request, response);
+    }
+}

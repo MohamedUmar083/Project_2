@@ -1,0 +1,148 @@
+<%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.DriverManager" %>
+<%@ page import="java.sql.PreparedStatement" %>
+<%@ page import="java.sql.ResultSet" %>
+<%@ page import="java.sql.SQLException" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="com.railway.Train" %> <!-- Update with the correct package name -->
+
+<%
+// Session management to check if the user is logged in
+String username = (String) session.getAttribute("username");
+
+// If not logged in, redirect to the login page
+if (username == null) {
+    response.sendRedirect("login.jsp");
+}
+
+// Database connection details (update with your actual values)
+String url = "jdbc:mysql://your-database-host:your-database-port/your-database-name";
+String user = "your-database-username";
+String password = "your-database-password";
+
+// Function to get the list of trains from the database
+List<Train> getTrainsFromDatabase() {
+    List<Train> trainList = new ArrayList<>();
+
+    try {
+        // Load the JDBC driver
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+        // Establish a connection
+        Connection connection = DriverManager.getConnection(url, user, password);
+
+        // Retrieve data from the database
+        String selectQuery = "SELECT * FROM trains";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(selectQuery)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            // Process the result set and populate the trainList
+            while (resultSet.next()) {
+                Train train = new Train();
+                train.setId(resultSet.getInt("id"));
+                train.setTrainName(resultSet.getString("train_name"));
+                train.setCrossingStatus(resultSet.getString("crossing_status"));
+                train.setPersonInCharge(resultSet.getString("person_in_charge"));
+                train.setTrainSchedule(resultSet.getString("train_schedule"));
+                train.setLandmark(resultSet.getString("landmark"));
+                train.setAddress(resultSet.getString("address"));
+
+                trainList.add(train);
+            }
+        }
+
+        // Close the connection
+        connection.close();
+    } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+    }
+
+    return trainList;
+}
+
+// Function to remove a train from the database
+void removeTrainFromDatabase(int trainId) {
+    try {
+        // Load the JDBC driver
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+        // Establish a connection
+        Connection connection = DriverManager.getConnection(url, user, password);
+
+        // Delete the train from the database
+        String deleteQuery = "DELETE FROM trains WHERE id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery)) {
+            preparedStatement.setInt(1, trainId);
+
+            // Execute the query
+            preparedStatement.executeUpdate();
+        }
+
+        // Close the connection
+        connection.close();
+    } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+    }
+}
+
+// Remove a train if the "remove" parameter is present in the request
+String removeTrainId = request.getParameter("remove");
+if (removeTrainId != null && !removeTrainId.isEmpty()) {
+    try {
+        int trainIdToRemove = Integer.parseInt(removeTrainId);
+        removeTrainFromDatabase(trainIdToRemove);
+    } catch (NumberFormatException e) {
+        e.printStackTrace();
+    }
+}
+
+// Get the list of trains from the database
+List<Train> trainList = getTrainsFromDatabase();
+%>
+
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+
+    <!-- Header -->
+    <h1>Welcome, <%= username %>!</h1>
+
+    <!-- Display the list of trains -->
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Train Name</th>
+            <th>Crossing Status</th>
+            <th>Person in Charge</th>
+            <th>Train Schedule</th>
+            <th>Landmark</th>
+            <th>Address</th>
+            <th>Action</th>
+        </tr>
+
+        <% for (Train train : trainList) { %>
+            <tr>
+                <td><%= train.getId() %></td>
+                <td><%= train.getTrainName() %></td>
+                <td><%= train.getCrossingStatus() %></td>
+                <td><%= train.getPersonInCharge() %></td>
+                <td><%= train.getTrainSchedule() %></td>
+                <td><%= train.getLandmark() %></td>
+                <td><%= train.getAddress() %></td>
+                <td>
+                    <form action="admin-dashboard.jsp" method="post">
+                        <input type="hidden" name="remove" value="<%= train.getId() %>">
+                        <input type="submit" value="Remove">
+                    </form>
+                </td>
+            </tr>
+        <% } %>
+    </table>
+
+    <!-- Rest of your code... -->
+
+</body>
+</html>

@@ -1,0 +1,75 @@
+<%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.DriverManager" %>
+<%@ page import="java.sql.PreparedStatement" %>
+<%@ page import="java.sql.ResultSet" %>
+<%@ page import="java.sql.SQLException" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Welcome to the Admin Dashboard</h1>
+
+    <h2>Train Details</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Train Name</th>
+                <th>Status</th>
+                <th>Person in Charge</th>
+                <th>Schedule</th>
+                <th>Landmark</th>
+                <th>Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            <%
+            try {
+                // Database connection details
+                String jdbcUrl = "jdbc:mysql://localhost:3306/railwayproject";
+                String dbUsername = "root";
+                String dbPassword = "Mohdumar@1011302";
+
+                // Establish the database connection
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                Connection connection = DriverManager.getConnection(jdbcUrl, dbUsername, dbPassword);
+
+                // Query to retrieve available trains
+                String sql = "SELECT * FROM trains";
+                try (PreparedStatement statement = connection.prepareStatement(sql);
+                     ResultSet resultSet = statement.executeQuery()) {
+
+                    while (resultSet.next()) {
+                        String trainName = resultSet.getString("train_name");
+                        String status = resultSet.getString("status");
+                        String personInCharge = resultSet.getString("person_in_charge");
+                        String schedule = resultSet.getString("schedule");
+                        String landmark = resultSet.getString("landmark");
+                        String address = resultSet.getString("address");
+
+                        // Display train details in the table
+            %>
+                        <tr>
+                            <td><%= trainName %></td>
+                            <td><%= status %></td>
+                            <td><%= personInCharge %></td>
+                            <td><%= schedule %></td>
+                            <td><%= landmark %></td>
+                            <td><%= address %></td>
+                        </tr>
+            <%
+                    }
+                }
+            } catch (ClassNotFoundException | SQLException e) {
+                e.printStackTrace(); // Handle the exception appropriately in your application
+            }
+            %>
+        </tbody>
+    </table>
+
+    <!-- Add any other admin-specific content here -->
+
+</body>
+</html>
+
